@@ -1,215 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="FmEEiqTzW8-ynk_dcUz-8lPMaC3ZNday9gACNCmVQxQ" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>My Movie Watcher</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-        
-        body {
-            background-color: #141414;
-            color: #fff;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-            border-bottom: 1px solid #333;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #e50914;
-        }
-        
-        .video-container {
-            width: 100%;
-            margin-bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .iframe-container {
-            position: relative;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-            height: 0;
-            overflow: hidden;
-            width: 100%;
-            max-width: 800px;
-        }
-        
-        .iframe-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .watchlist-section {
-            margin-top: 40px;
-            width: 100%;
-        }
-        
-        .watchlist-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .watchlist-header h2 {
-            font-size: 1.8rem;
-            color: #e50914;
-        }
-        
-        .add-movie-form {
-            display: flex;
-            margin-bottom: 20px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        button {
-            background-color: #e50914;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #f40612;
-        }
-        
-        input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #333;
-            border-radius: 4px;
-            background-color: #333;
-            color: white;
-            min-width: 200px;
-        }
-        
-        .watchlist {
-            background-color: #1f1f1f;
-            border-radius: 8px;
-            padding: 15px;
-        }
-        
-        .watchlist-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            background-color: #2c2c2c;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-        
-        .watchlist-item:hover {
-            background-color: #3a3a3a;
-        }
-        
-        .watchlist-item-info {
-            flex: 1;
-        }
-        
-        .watchlist-item-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .watchlist-item-url {
-            font-size: 0.9rem;
-            color: #aaa;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .watchlist-item-actions {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .remove-btn, .watch-btn, .watched-btn, .unwatched-btn {
-            padding: 5px 10px;
-            font-size: 0.9rem;
-        }
-        
-        .remove-btn {
-            background-color: #a30e0e;
-        }
-        
-        .remove-btn:hover {
-            background-color: #c01212;
-        }
-        
-        .watch-btn {
-            background-color: #0e7a0e;
-        }
-        
-        .watch-btn:hover {
-            background-color: #12c012;
-        }
-        
-        .watched-btn {
-            background-color: #0e7a0e;
-        }
-        
-        .watched-btn:hover {
-            background-color: #12c012;
-        }
-        
-        .unwatched-btn {
-            background-color: #e50914;
-        }
-        
-        .unwatched-btn:hover {
-            background-color: #f40612;
-        }
-        
-        .watched-badge {
-            background-color: #0e7a0e;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            margin-left: 10px;
-        }
-        
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .add-movie-form {
-                flex-direction: column;
-            }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #141414; color: #fff; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+        h1 { font-size: 2.5rem; color: #e50914; margin-bottom: 10px; }
+        .video-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
+        .iframe-container { position: relative; padding-bottom: 56.25%; width: 100%; max-width: 800px; height: 0; overflow: hidden; }
+        .iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .watchlist-section { margin-top: 40px; }
+        .watchlist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .watchlist-header h2 { font-size: 1.6rem; color: #e50914; outline: none; }
+        .add-movie-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #333; border-radius: 4px; background-color: #333; color: white; min-width: 200px; }
+        button { background-color: #e50914; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #f40612; }
+        .watchlist { background-color: #1f1f1f; border-radius: 8px; padding: 15px; }
+        .watchlist-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; margin-bottom: 10px; background-color: #2c2c2c; border-radius: 4px; }
+        .watchlist-item:hover { background-color: #3a3a3a; }
+        .watchlist-item-title { font-weight: bold; }
+        .watchlist-item-actions { display: flex; gap: 5px; }
+        .move-btn, .remove-btn, .watch-btn { padding: 5px 10px; font-size: 0.9rem; }
+        .move-btn { background-color: #0e7a0e; }
+        .remove-btn { background-color: #a30e0e; }
+        .watch-btn { background-color: #0066cc; }
+        @media (max-width: 600px) {
+            .add-movie-form { flex-direction: column; }
         }
     </style>
 </head>
@@ -217,218 +38,122 @@
     <div class="container">
         <header>
             <h1>My Movie Watcher</h1>
-            <p>Your personal movie streaming and tracking platform</p>
+            <p>Enter movie ID and name to add to your lists</p>
         </header>
-        
+
         <div class="video-container">
             <div class="iframe-container">
                 <iframe id="movie-player" src="" frameborder="0" allowfullscreen></iframe>
             </div>
         </div>
-        
-        <div class="watchlist-section">
-            <div class="watchlist-header">
-                <h2>My Watchlist</h2>
-                <span id="watchlist-count">0 movies</span>
-            </div>
-            
-            <div class="add-movie-form">
-                <input type="text" id="movie-title-input" placeholder="Enter movie title">
-                <input type="text" id="movie-url-input" placeholder="Enter movie URL (e.g., https://vidsrc.xyz/embed/movie/tt0147800)">
-                <button id="add-movie-btn">Add Movie</button>
-            </div>
-            
-            <div class="watchlist" id="watchlist">
-                <!-- Watchlist items will be added here dynamically -->
-                <p class="empty-message">Your watchlist is empty. Add movies using the form above.</p>
-            </div>
-        </div>
+
+        <div id="lists-container"></div>
     </div>
 
     <script>
-        // DOM Elements
-        const moviePlayer = document.getElementById('movie-player');
-        const movieTitleInput = document.getElementById('movie-title-input');
-        const movieUrlInput = document.getElementById('movie-url-input');
-        const addMovieBtn = document.getElementById('add-movie-btn');
-        const watchlist = document.getElementById('watchlist');
-        const watchlistCount = document.getElementById('watchlist-count');
-        
-        // App State
-        let watchlistData = JSON.parse(localStorage.getItem('watchlist')) || [];
-        let currentMovieUrl = '';
-        
-        // Initialize the app
-        function init() {
-            renderWatchlist();
-            updateWatchlistCount();
-            
-            // Event Listeners
-            addMovieBtn.addEventListener('click', addMovieToWatchlist);
-            movieUrlInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    addMovieToWatchlist();
-                }
-            });
-            
-            // Check if there's a movie in the URL hash
-            const hash = window.location.hash.slice(1);
-            if (hash) {
-                loadMovie(hash);
+    const API_BASE = 'https://vidsrc.xyz/embed/movie/';
+    const LISTS = ['Watching Now', 'Plan to Watch', 'Completed'];
+
+    let lists = JSON.parse(localStorage.getItem('movieLists')) || {
+        'Watching Now': [],
+        'Plan to Watch': [],
+        'Completed': []
+    };
+
+    const player = document.getElementById('movie-player');
+    const listsContainer = document.getElementById('lists-container');
+
+    function saveLists() {
+        localStorage.setItem('movieLists', JSON.stringify(lists));
+    }
+
+    function renderLists() {
+        listsContainer.innerHTML = '';
+        LISTS.forEach(listName => {
+            const section = document.createElement('div');
+            section.className = 'watchlist-section';
+            section.innerHTML = `
+                <div class="watchlist-header">
+                    <h2 contenteditable="true" data-list="${listName}">${listName}</h2>
+                    <span>${lists[listName].length} movies</span>
+                </div>
+                <div class="add-movie-form">
+                    <input type="text" placeholder="Movie ID (e.g. tt3799232)" class="id-input" />
+                    <input type="text" placeholder="Movie Name (e.g. It Ends With Us)" class="name-input" />
+                    <button onclick="addMovie('${listName}')">Add</button>
+                </div>
+                <div class="watchlist" id="${listName.replace(/\s+/g, '-')}">
+                    ${lists[listName].map((m, i) => `
+                        <div class="watchlist-item">
+                            <div class="watchlist-item-title">${m.name}</div>
+                            <div class="watchlist-item-actions">
+                                <button class="watch-btn" onclick="watchMovie('${m.id}')">Watch</button>
+
+                                <select onchange="this.nextElementSibling.dataset.to=this.value">
+                                    ${LISTS.filter(l => l !== listName).map(l => `<option value="${l}">${l}</option>`).join('')}
+                                </select>
+                                <button class="move-btn" data-to="" onclick="moveMovie('${listName}', ${i}, this.dataset.to)">Move</button>
+
+                                <button class="remove-btn" onclick="removeMovie('${listName}', ${i})">Remove</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            listsContainer.appendChild(section);
+        });
+    }
+
+    function addMovie(listName) {
+        const section = [...listsContainer.children].find(sec => sec.querySelector(`[data-list="${listName}"]`));
+        const id = section.querySelector('.id-input').value.trim();
+        const name = section.querySelector('.name-input').value.trim();
+        if (!id || !name) return alert('Please enter both ID and name.');
+        lists[listName].push({ id, name });
+        saveLists();
+        renderLists();
+    }
+
+    function watchMovie(id) {
+        player.src = `${API_BASE}${id}`;
+        window.location.hash = id;
+    }
+
+    function removeMovie(listName, index) {
+        lists[listName].splice(index, 1);
+        saveLists();
+        renderLists();
+    }
+
+    function moveMovie(fromList, index, toList) {
+        if (!toList) return;
+        lists[toList].push(lists[fromList][index]);
+        lists[fromList].splice(index, 1);
+        saveLists();
+        renderLists();
+    }
+
+    // Allow list renaming
+    document.addEventListener('blur', e => {
+        if (e.target.hasAttribute('data-list')) {
+            const oldName = e.target.dataset.list;
+            const newName = e.target.textContent.trim();
+            if (newName && newName !== oldName && !lists[newName]) {
+                lists[newName] = lists[oldName];
+                delete lists[oldName];
+                saveLists();
+                renderLists();
             }
         }
-        
-        // Render the watchlist from data
-        function renderWatchlist() {
-            if (watchlistData.length === 0) {
-                watchlist.innerHTML = '<p class="empty-message">Your watchlist is empty. Add movies using the form above.</p>';
-                return;
-            }
-            
-            watchlist.innerHTML = '';
-            
-            watchlistData.forEach((item, index) => {
-                const watchlistItem = document.createElement('div');
-                watchlistItem.className = 'watchlist-item';
-                watchlistItem.innerHTML = `
-                    <div class="watchlist-item-info">
-                        <div class="watchlist-item-title">${item.title}${item.watched ? ' <span class="watched-badge">Watched</span>' : ''}</div>
-                        <div class="watchlist-item-url">${item.url}</div>
-                    </div>
-                    <div class="watchlist-item-actions">
-                        <button class="watch-btn" data-index="${index}">Watch</button>
-                        ${item.watched ? 
-                            `<button class="unwatched-btn" data-index="${index}">Unwatched</button>` : 
-                            `<button class="watched-btn" data-index="${index}">Mark as Watched</button>`
-                        }
-                        <button class="remove-btn" data-index="${index}">Remove</button>
-                    </div>
-                `;
-                
-                watchlist.appendChild(watchlistItem);
-            });
-            
-            // Add event listeners to watch, mark as watched/unwatched, and remove buttons
-            document.querySelectorAll('.watch-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = this.getAttribute('data-index');
-                    loadMovie(watchlistData[index].url);
-                });
-            });
-            
-            document.querySelectorAll('.watched-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = this.getAttribute('data-index');
-                    markAsWatched(index);
-                });
-            });
-            
-            document.querySelectorAll('.unwatched-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = this.getAttribute('data-index');
-                    markAsUnwatched(index);
-                });
-            });
-            
-            document.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = this.getAttribute('data-index');
-                    removeFromWatchlist(index);
-                });
-            });
-        }
-        
-        // Update watchlist count display
-        function updateWatchlistCount() {
-            watchlistCount.textContent = `${watchlistData.length} movies`;
-        }
-        
-        // Load a movie into the player
-        function loadMovie(url) {
-            currentMovieUrl = url;
-            moviePlayer.src = url;
-            
-            // Update URL hash for bookmarking
-            window.location.hash = url;
-        }
-        
-        // Add movie to watchlist directly from URL
-        function addMovieToWatchlist() {
-            const url = movieUrlInput.value.trim();
-            const title = movieTitleInput.value.trim() || 'Untitled Movie';
-            
-            if (!url) {
-                alert('Please enter a valid movie URL!');
-                return;
-            }
-            
-            // Check if URL is valid (basic check)
-            if (!url.startsWith('http')) {
-                alert('Please enter a valid HTTP URL!');
-                return;
-            }
-            
-            const existingItem = watchlistData.find(item => item.url === url);
-            if (existingItem) {
-                alert('This movie is already in your watchlist!');
-                return;
-            }
-            
-            watchlistData.push({ url, title, watched: false });
-            saveWatchlist();
-            renderWatchlist();
-            updateWatchlistCount();
-            
-            // Clear inputs
-            movieUrlInput.value = '';
-            movieTitleInput.value = '';
-            
-            // Load the movie
-            loadMovie(url);
-        }
-        
-        // Remove movie from watchlist
-        function removeFromWatchlist(index) {
-            if (index >= 0 && index < watchlistData.length) {
-                watchlistData.splice(index, 1);
-                saveWatchlist();
-                renderWatchlist();
-                updateWatchlistCount();
-                
-                // If the removed movie was the current one, clear the player
-                if (watchlistData[index]?.url === currentMovieUrl) {
-                    moviePlayer.src = '';
-                    currentMovieUrl = '';
-                }
-            }
-        }
-        
-        // Mark a movie as watched
-        function markAsWatched(index) {
-            if (index >= 0 && index < watchlistData.length) {
-                watchlistData[index].watched = true;
-                saveWatchlist();
-                renderWatchlist();
-            }
-        }
-        
-        // Mark a movie as unwatched
-        function markAsUnwatched(index) {
-            if (index >= 0 && index < watchlistData.length) {
-                watchlistData[index].watched = false;
-                saveWatchlist();
-                renderWatchlist();
-            }
-        }
-        
-        // Save watchlist to local storage
-        function saveWatchlist() {
-            localStorage.setItem('watchlist', JSON.stringify(watchlistData));
-        }
-        
-        // Initialize the app
-        init();
-    </script>
+    });
+
+    // Load from URL hash
+    window.addEventListener('hashchange', () => {
+        const id = window.location.hash.slice(1);
+        if (id) player.src = `${API_BASE}${id}`;
+    });
+
+    renderLists();
+</script>
 </body>
-            </html>
-                    
+</html>

@@ -1,159 +1,693 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>My Movie Watcher</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieTracker | Track & Stream Movies</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8b5cf6',
+                        secondary: '#6366f1',
+                        dark: '#0f172a',
+                        darker: '#0c1220',
+                        light: '#f1f5f9'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #141414; color: #fff; line-height: 1.6; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 20px; }
-        h1 { font-size: 2.5rem; color: #e50914; margin-bottom: 10px; }
-        .video-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
-        .iframe-container { position: relative; padding-bottom: 56.25%; width: 100%; max-width: 800px; height: 0; overflow: hidden; }
-        .iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .watchlist-section { margin-top: 40px; }
-        .watchlist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .watchlist-header h2 { font-size: 1.6rem; color: #e50914; outline: none; }
-        .add-movie-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #333; border-radius: 4px; background-color: #333; color: white; min-width: 200px; }
-        button { background-color: #e50914; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #f40612; }
-        .watchlist { background-color: #1f1f1f; border-radius: 8px; padding: 15px; }
-        .watchlist-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; margin-bottom: 10px; background-color: #2c2c2c; border-radius: 4px; }
-        .watchlist-item:hover { background-color: #3a3a3a; }
-        .watchlist-item-title { font-weight: bold; }
-        .watchlist-item-actions { display: flex; gap: 5px; }
-        .move-btn, .remove-btn, .watch-btn { padding: 5px 10px; font-size: 0.9rem; }
-        .move-btn { background-color: #0e7a0e; }
-        .remove-btn { background-color: #a30e0e; }
-        .watch-btn { background-color: #0066cc; }
-        @media (max-width: 600px) {
-            .add-movie-form { flex-direction: column; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .movie-card {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #8b5cf6;
+        }
+        
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 25px;
+            width: 2px;
+            height: calc(100% + 10px);
+            background-color: #7c3aed;
+        }
+        
+        .player-container {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dark-toggle {
+            transition: transform 0.3s ease;
+        }
+        
+        .dark-toggle:hover {
+            transform: rotate(30deg);
+        }
+        
+        .search-bar:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+        }
+        
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+        }
+        
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link.active {
+            background-color: #8b5cf6;
+            color: white;
+        }
+        
+        .nav-link:not(.active):hover {
+            background-color: #1e293b;
+        }
+        
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background-color: #8b5cf6;
+            color: white;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>My Movie Watcher</h1>
-            <p>Enter movie ID and name to add to your lists</p>
-        </header>
-
-        <div class="video-container">
-            <div class="iframe-container">
-                <iframe id="movie-player" src="" frameborder="0" allowfullscreen></iframe>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-dark py-4 px-6 shadow-lg">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-4 md:mb-0">
+                <i class="fas fa-film text-primary text-2xl mr-3"></i>
+                <h1 class="text-2xl font-bold">Movie<span class="text-primary">Tracker</span></h1>
+            </div>
+            
+            <div class="flex space-x-2 mb-4 md:mb-0">
+                <a href="#" id="trackerLink" class="nav-link active">
+                    <i class="fas fa-list mr-2"></i> Tracker
+                </a>
+                <a href="#" id="streamingLink" class="nav-link">
+                    <i class="fas fa-play-circle mr-2"></i> Streaming
+                </a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="relative w-full md:w-64">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search movies..." 
+                        class="search-bar w-full bg-darker text-light rounded-full py-2 px-4 pl-10 focus:ring-2 focus:ring-primary transition-all"
+                    >
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                
+                <button id="darkModeToggle" class="dark-toggle p-2 rounded-full bg-darker hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-moon text-yellow-300"></i>
+                </button>
             </div>
         </div>
+    </nav>
 
-        <div id="lists-container"></div>
-    </div>
+    <!-- Main Content -->
+    <main class="container mx-auto py-8 px-4">
+        <!-- Tracker Page -->
+        <div id="trackerPage">
+            <!-- Add Movie Section -->
+            <section class="mb-12 bg-darker rounded-xl p-6 shadow-lg">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <i class="fas fa-plus-circle text-primary mr-2"></i> Add New Movie
+                </h2>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input 
+                        type="text" 
+                        id="imdbIdInput" 
+                        placeholder="Enter IMDb ID (e.g. tt3799232)" 
+                        class="flex-grow bg-dark text-light rounded-lg py-3 px-4 focus:ring-2 focus:ring-primary transition-all"
+                    >
+                    <input 
+                        type="text" 
+                        id="movieNameInput" 
+                        placeholder="Movie Name (optional)" 
+                        class="flex-grow bg-dark text-light rounded-lg py-3 px-4 focus:ring-2 focus:ring-primary transition-all"
+                    >
+                    <select id="statusSelect" class="bg-dark text-light rounded-lg py-3 px-4 focus:ring-2 focus:ring-primary transition-all">
+                        <option value="plan">Plan to Watch</option>
+                        <option value="watching">Watching</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                    <button id="addMovieBtn" class="bg-primary hover:bg-secondary text-white font-medium py-3 px-6 rounded-lg transition-all flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add Movie
+                    </button>
+                </div>
+            </section>
+
+            <!-- Movie Lists -->
+            <section class="mb-12">
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <button class="filter-btn active px-4 py-2 rounded-full bg-darker hover:bg-dark font-medium" data-filter="all">
+                        All Movies
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-darker hover:bg-dark font-medium" data-filter="plan">
+                        Plan to Watch
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-darker hover:bg-dark font-medium" data-filter="watching">
+                        Watching
+                    </button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-darker hover:bg-dark font-medium" data-filter="completed">
+                        Completed
+                    </button>
+                </div>
+
+                <div id="movieLists" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Plan to Watch List -->
+                    <div class="list-container" data-status="plan">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold flex items-center">
+                                <i class="fas fa-bookmark text-yellow-500 mr-2"></i> Plan to Watch
+                            </h2>
+                            <span id="planCount" class="bg-gray-700 text-gray-300 text-sm font-medium px-2.5 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="planList" class="space-y-4 min-h-[200px]">
+                            <!-- Movie cards will be added here -->
+                        </div>
+                    </div>
+
+                    <!-- Watching List -->
+                    <div class="list-container" data-status="watching">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold flex items-center">
+                                <i class="fas fa-play-circle text-green-500 mr-2"></i> Watching
+                            </h2>
+                            <span id="watchingCount" class="bg-gray-700 text-gray-300 text-sm font-medium px-2.5 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="watchingList" class="space-y-4 min-h-[200px]">
+                            <!-- Movie cards will be added here -->
+                        </div>
+                    </div>
+
+                    <!-- Completed List -->
+                    <div class="list-container" data-status="completed">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold flex items-center">
+                                <i class="fas fa-check-circle text-blue-500 mr-2"></i> Completed
+                            </h2>
+                            <span id="completedCount" class="bg-gray-700 text-gray-300 text-sm font-medium px-2.5 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="completedList" class="space-y-4 min-h-[200px]">
+                            <!-- Movie cards will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Timeline -->
+            <section>
+                <h2 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-history text-primary mr-2"></i> Watch History
+                </h2>
+                <div id="historyTimeline" class="relative pl-6 border-l-2 border-primary ml-3">
+                    <!-- Timeline items will be added here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Streaming Page -->
+        <div id="streamingPage" class="hidden">
+            <div class="player-container">
+                <div class="p-4 border-b border-gray-700 flex justify-between items-center">
+                    <div>
+                        <h2 id="streamingTitle" class="text-xl font-bold">Now Playing</h2>
+                        <p id="streamingId" class="text-gray-400 text-sm">tt0000000</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="backToTracker" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Tracker
+                        </button>
+                        <button id="moveToWatching" class="bg-yellow-600 hover:bg-yellow-500 text-white py-2 px-4 rounded-lg transition-all hidden">
+                            <i class="fas fa-play mr-2"></i> Mark as Watching
+                        </button>
+                        <button id="moveToCompleted" class="bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg transition-all">
+                            <i class="fas fa-check mr-2"></i> Mark as Completed
+                        </button>
+                    </div>
+                </div>
+                <div class="aspect-w-16 aspect-h-9">
+                    <iframe 
+                        id="moviePlayer" 
+                        src="" 
+                        class="w-full h-96 md:h-[500px]" 
+                        frameborder="0" 
+                        allowfullscreen
+                    ></iframe>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark py-6 mt-12">
+        <div class="container mx-auto px-4 text-center text-gray-400">
+            <p>© 2023 MovieTracker. Track and stream your movies with ease.</p>
+        </div>
+    </footer>
 
     <script>
-    const API_BASE = 'https://vidsrc.xyz/embed/movie/';
-    const LISTS = ['Watching Now', 'Plan to Watch', 'Completed'];
+        // Sample movie data for demonstration
+        const sampleMovies = [
+            { id: 'tt0816692', title: 'Interstellar', status: 'completed', completedDate: '2023-06-05' },
+            { id: 'tt0468569', title: 'The Dark Knight', status: 'completed', completedDate: '2023-06-10' },
+            { id: 'tt1375666', title: 'Inception', status: 'completed', completedDate: '2023-06-15' },
+            { id: 'tt3799232', title: 'The Neon Demon', status: 'watching' },
+            { id: 'tt0111161', title: 'The Shawshank Redemption', status: 'plan' }
+        ];
 
-    let lists = JSON.parse(localStorage.getItem('movieLists')) || {
-        'Watching Now': [],
-        'Plan to Watch': [],
-        'Completed': []
-    };
-
-    const player = document.getElementById('movie-player');
-    const listsContainer = document.getElementById('lists-container');
-
-    function saveLists() {
-        localStorage.setItem('movieLists', JSON.stringify(lists));
-    }
-
-    function renderLists() {
-        listsContainer.innerHTML = '';
-        LISTS.forEach(listName => {
-            const section = document.createElement('div');
-            section.className = 'watchlist-section';
-            section.innerHTML = `
-                <div class="watchlist-header">
-                    <h2 contenteditable="true" data-list="${listName}">${listName}</h2>
-                    <span>${lists[listName].length} movies</span>
-                </div>
-                <div class="add-movie-form">
-                    <input type="text" placeholder="Movie ID (e.g. tt3799232)" class="id-input" />
-                    <input type="text" placeholder="Movie Name (e.g. It Ends With Us)" class="name-input" />
-                    <button onclick="addMovie('${listName}')">Add</button>
-                </div>
-                <div class="watchlist" id="${listName.replace(/\s+/g, '-')}">
-                    ${lists[listName].map((m, i) => `
-                        <div class="watchlist-item">
-                            <div class="watchlist-item-title">${m.name}</div>
-                            <div class="watchlist-item-actions">
-                                <button class="watch-btn" onclick="watchMovie('${m.id}')">Watch</button>
-
-                                <select onchange="this.nextElementSibling.dataset.to=this.value">
-                                    ${LISTS.filter(l => l !== listName).map(l => `<option value="${l}">${l}</option>`).join('')}
-                                </select>
-                                <button class="move-btn" data-to="" onclick="moveMovie('${listName}', ${i}, this.dataset.to)">Move</button>
-
-                                <button class="remove-btn" onclick="removeMovie('${listName}', ${i})">Remove</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            listsContainer.appendChild(section);
-        });
-    }
-
-    function addMovie(listName) {
-        const section = [...listsContainer.children].find(sec => sec.querySelector(`[data-list="${listName}"]`));
-        const id = section.querySelector('.id-input').value.trim();
-        const name = section.querySelector('.name-input').value.trim();
-        if (!id || !name) return alert('Please enter both ID and name.');
-        lists[listName].push({ id, name });
-        saveLists();
-        renderLists();
-    }
-
-    function watchMovie(id) {
-        player.src = `${API_BASE}${id}`;
-        window.location.hash = id;
-    }
-
-    function removeMovie(listName, index) {
-        lists[listName].splice(index, 1);
-        saveLists();
-        renderLists();
-    }
-
-    function moveMovie(fromList, index, toList) {
-        if (!toList) return;
-        lists[toList].push(lists[fromList][index]);
-        lists[fromList].splice(index, 1);
-        saveLists();
-        renderLists();
-    }
-
-    // Allow list renaming
-    document.addEventListener('blur', e => {
-        if (e.target.hasAttribute('data-list')) {
-            const oldName = e.target.dataset.list;
-            const newName = e.target.textContent.trim();
-            if (newName && newName !== oldName && !lists[newName]) {
-                lists[newName] = lists[oldName];
-                delete lists[oldName];
-                saveLists();
-                renderLists();
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load movies from localStorage or use sample data
+            let movies = JSON.parse(localStorage.getItem('movies')) || sampleMovies;
+            let history = JSON.parse(localStorage.getItem('history')) || [];
+            
+            // Save to localStorage
+            function saveData() {
+                localStorage.setItem('movies', JSON.stringify(movies));
+                localStorage.setItem('history', JSON.stringify(history));
             }
-        }
-    });
-
-    // Load from URL hash
-    window.addEventListener('hashchange', () => {
-        const id = window.location.hash.slice(1);
-        if (id) player.src = `${API_BASE}${id}`;
-    });
-
-    renderLists();
-</script>
+            
+            // DOM Elements
+            const trackerPage = document.getElementById('trackerPage');
+            const streamingPage = document.getElementById('streamingPage');
+            const trackerLink = document.getElementById('trackerLink');
+            const streamingLink = document.getElementById('streamingLink');
+            const backToTracker = document.getElementById('backToTracker');
+            const addMovieBtn = document.getElementById('addMovieBtn');
+            const imdbIdInput = document.getElementById('imdbIdInput');
+            const movieNameInput = document.getElementById('movieNameInput');
+            const statusSelect = document.getElementById('statusSelect');
+            const playerSection = document.getElementById('playerSection');
+            const moviePlayer = document.getElementById('moviePlayer');
+            const streamingTitle = document.getElementById('streamingTitle');
+            const streamingId = document.getElementById('streamingId');
+            const moveToWatching = document.getElementById('moveToWatching');
+            const moveToCompleted = document.getElementById('moveToCompleted');
+            const searchInput = document.getElementById('searchInput');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const planList = document.getElementById('planList');
+            const watchingList = document.getElementById('watchingList');
+            const completedList = document.getElementById('completedList');
+            const planCount = document.getElementById('planCount');
+            const watchingCount = document.getElementById('watchingCount');
+            const completedCount = document.getElementById('completedCount');
+            const historyTimeline = document.getElementById('historyTimeline');
+            
+            // Navigation
+            trackerLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                trackerPage.classList.remove('hidden');
+                streamingPage.classList.add('hidden');
+                trackerLink.classList.add('active');
+                streamingLink.classList.remove('active');
+            });
+            
+            streamingLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentMovie) {
+                    trackerPage.classList.add('hidden');
+                    streamingPage.classList.remove('hidden');
+                    streamingLink.classList.add('active');
+                    trackerLink.classList.remove('active');
+                } else {
+                    alert('Please select a movie to stream');
+                }
+            });
+            
+            backToTracker.addEventListener('click', () => {
+                trackerPage.classList.remove('hidden');
+                streamingPage.classList.add('hidden');
+                trackerLink.classList.add('active');
+                streamingLink.classList.remove('active');
+            });
+            
+            // Dark mode toggle
+            darkModeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const icon = darkModeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            });
+            
+            // Filter buttons
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderMovies();
+                });
+            });
+            
+            // Current movie being streamed
+            let currentMovie = null;
+            
+            // Move to Watching
+            moveToWatching.addEventListener('click', () => {
+                if (currentMovie) {
+                    updateMovieStatus(currentMovie.id, 'watching');
+                    moveToWatching.classList.add('hidden');
+                    moveToCompleted.classList.remove('hidden');
+                }
+            });
+            
+            // Move to Completed
+            moveToCompleted.addEventListener('click', () => {
+                if (currentMovie) {
+                    updateMovieStatus(currentMovie.id, 'completed');
+                    moveToWatching.classList.add('hidden');
+                    moveToCompleted.classList.add('hidden');
+                }
+            });
+            
+            // Add movie
+            addMovieBtn.addEventListener('click', () => {
+                const imdbId = imdbIdInput.value.trim();
+                const movieName = movieNameInput.value.trim();
+                const status = statusSelect.value;
+                
+                if (!imdbId) {
+                    alert('Please enter an IMDb ID');
+                    return;
+                }
+                
+                // Validate IMDb ID format
+                if (!imdbId.match(/^tt\d+$/)) {
+                    alert('Please enter a valid IMDb ID (e.g. tt3799232)');
+                    return;
+                }
+                
+                // Check if movie already exists
+                if (movies.some(movie => movie.id === imdbId)) {
+                    alert('This movie is already in your list!');
+                    return;
+                }
+                
+                // Add to movies array
+                const newMovie = {
+                    id: imdbId,
+                    title: movieName || 'Unknown Title',
+                    status: status
+                };
+                
+                movies.push(newMovie);
+                saveData();
+                renderMovies();
+                
+                // Clear inputs
+                imdbIdInput.value = '';
+                movieNameInput.value = '';
+            });
+            
+            // Render movies
+            function renderMovies() {
+                // Clear lists
+                planList.innerHTML = '';
+                watchingList.innerHTML = '';
+                completedList.innerHTML = '';
+                
+                // Get active filter
+                const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                
+                // Filter and sort movies
+                const filteredMovies = activeFilter === 'all' 
+                    ? [...movies] 
+                    : movies.filter(movie => movie.status === activeFilter);
+                
+                // Search filter
+                const searchTerm = searchInput.value.toLowerCase();
+                const searchedMovies = filteredMovies.filter(movie => 
+                    movie.id.toLowerCase().includes(searchTerm) || 
+                    movie.title.toLowerCase().includes(searchTerm)
+                );
+                
+                // Count movies by status
+                const counts = { plan: 0, watching: 0, completed: 0 };
+                movies.forEach(movie => counts[movie.status]++);
+                planCount.textContent = counts.plan;
+                watchingCount.textContent = counts.watching;
+                completedCount.textContent = counts.completed;
+                
+                // Render movies
+                searchedMovies.forEach(movie => {
+                    const movieCard = createMovieCard(movie);
+                    if (movie.status === 'plan') {
+                        planList.appendChild(movieCard);
+                    } else if (movie.status === 'watching') {
+                        watchingList.appendChild(movieCard);
+                    } else if (movie.status === 'completed') {
+                        completedList.appendChild(movieCard);
+                    }
+                });
+                
+                // Update history timeline
+                renderHistory();
+            }
+            
+            // Create movie card
+            function createMovieCard(movie) {
+                const card = document.createElement('div');
+                card.className = 'movie-card rounded-xl overflow-hidden cursor-pointer transform transition-transform';
+                card.draggable = true;
+                card.dataset.id = movie.id;
+                card.dataset.status = movie.status;
+                
+                // Status badge
+                let badgeClass = '';
+                let badgeText = '';
+                if (movie.status === 'plan') {
+                    badgeClass = 'bg-yellow-500 text-yellow-900';
+                    badgeText = 'Plan';
+                } else if (movie.status === 'watching') {
+                    badgeClass = 'bg-green-500 text-green-900';
+                    badgeText = 'Watching';
+                } else {
+                    badgeClass = 'bg-blue-500 text-blue-900';
+                    badgeText = 'Completed';
+                }
+                
+                card.innerHTML = `
+                    <div class="relative">
+                        <div class="bg-gray-800 h-48 flex items-center justify-center">
+                            <i class="fas fa-film text-5xl text-gray-600"></i>
+                        </div>
+                        <div class="status-badge ${badgeClass}">${badgeText}</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg truncate">${movie.title}</h3>
+                        <p class="text-gray-400 text-sm mt-1">ID: ${movie.id}</p>
+                    </div>
+                `;
+                
+                // Add click event to play movie
+                card.addEventListener('click', () => {
+                    playMovie(movie);
+                });
+                
+                // Drag and drop functionality
+                card.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', movie.id);
+                    setTimeout(() => card.classList.add('dragging'), 0);
+                });
+                
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
+                
+                return card;
+            }
+            
+            // Play movie
+            function playMovie(movie) {
+                currentMovie = movie;
+                streamingTitle.textContent = movie.title;
+                streamingId.textContent = movie.id;
+                moviePlayer.src = `https://vidsrc.xyz/embed/movie/${movie.id}`;
+                
+                // Show appropriate buttons
+                if (movie.status === 'plan') {
+                    moveToWatching.classList.remove('hidden');
+                    moveToCompleted.classList.remove('hidden');
+                } else if (movie.status === 'watching') {
+                    moveToWatching.classList.add('hidden');
+                    moveToCompleted.classList.remove('hidden');
+                } else {
+                    moveToWatching.classList.add('hidden');
+                    moveToCompleted.classList.add('hidden');
+                }
+                
+                // Navigate to streaming page
+                trackerPage.classList.add('hidden');
+                streamingPage.classList.remove('hidden');
+                streamingLink.classList.add('active');
+                trackerLink.classList.remove('active');
+            }
+            
+            // Update movie status
+            function updateMovieStatus(movieId, newStatus) {
+                const movie = movies.find(m => m.id === movieId);
+                if (movie) {
+                    const oldStatus = movie.status;
+                    movie.status = newStatus;
+                    
+                    // If moved to completed, add to history
+                    if (newStatus === 'completed' && oldStatus !== 'completed') {
+                        movie.completedDate = new Date().toISOString().split('T')[0];
+                        history.push({
+                            id: movie.id,
+                            title: movie.title,
+                            date: movie.completedDate
+                        });
+                    }
+                    
+                    saveData();
+                    renderMovies();
+                    
+                    // Update streaming page if this is the current movie
+                    if (currentMovie && currentMovie.id === movieId) {
+                        if (newStatus === 'plan') {
+                            moveToWatching.classList.remove('hidden');
+                            moveToCompleted.classList.remove('hidden');
+                        } else if (newStatus === 'watching') {
+                            moveToWatching.classList.add('hidden');
+                            moveToCompleted.classList.remove('hidden');
+                        } else {
+                            moveToWatching.classList.add('hidden');
+                            moveToCompleted.classList.add('hidden');
+                        }
+                    }
+                }
+            }
+            
+            // Render history timeline
+            function renderHistory() {
+                // Clear timeline
+                historyTimeline.innerHTML = '';
+                
+                // Sort history by date (newest first)
+                const sortedHistory = [...history].sort((a, b) => 
+                    new Date(b.date) - new Date(a.date)
+                );
+                
+                // Render history items
+                sortedHistory.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'timeline-item mb-8 pb-8 relative pl-6';
+                    historyItem.innerHTML = `
+                        <div class="text-sm text-gray-400">${formatDate(item.date)}</div>
+                        <div class="mt-1 bg-darker p-4 rounded-lg">
+                            <div class="font-medium">${item.title}</div>
+                            <div class="text-sm text-gray-400">${item.id}</div>
+                        </div>
+                    `;
+                    historyTimeline.appendChild(historyItem);
+                });
+                
+                // If no history, show message
+                if (sortedHistory.length === 0) {
+                    historyTimeline.innerHTML = '<p class="text-gray-500 text-center py-8">No completed movies yet. Start watching!</p>';
+                }
+            }
+            
+            // Format date
+            function formatDate(dateString) {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+            
+            // Drag and drop setup
+            const listContainers = document.querySelectorAll('.list-container');
+            
+            listContainers.forEach(container => {
+                container.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    container.classList.add('bg-gray-800');
+                });
+                
+                container.addEventListener('dragleave', () => {
+                    container.classList.remove('bg-gray-800');
+                });
+                
+                container.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    container.classList.remove('bg-gray-800');
+                    
+                    const movieId = e.dataTransfer.getData('text/plain');
+                    const newStatus = container.dataset.status;
+                    
+                    updateMovieStatus(movieId, newStatus);
+                });
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', renderMovies);
+            
+            // Initialize
+            renderMovies();
+        });
+    </script>
 </body>
 </html>
